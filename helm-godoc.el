@@ -119,7 +119,7 @@
 (defvar helm-godoc--installed-package-source
   '((name . "Installed Go Package")
     (candidates . (lambda ()
-                    (cons "bulitin" (go-packages))))
+                    (cons "builtin" (go-packages))))
     (action . (("View Document" . godoc)
                ("View Source Code" . helm-godoc--view-source-code)
                ("Import Package" . helm-godoc--import-package)
