@@ -64,10 +64,51 @@
                 (back-to-indentation))
               finally return (reverse importeds))))))
 
-(defun helm-godoc--collect-imported-modules ()
+(defconst helm-godoc--package-regexp
+  (format "^\\s-*package\\s-+\\(%s\\)" go-identifier-regexp))
+
+(defun helm-godoc--find-package (package)
+  (let ((importeds (progn
+                     (helm-godoc--collect-imported-modules (current-buffer))
+                     helm-godoc--imported-modules)))
+    (loop for imported in importeds
+          for regexp = (concat package "\\'")
+          when (string-match-p regexp imported)
+          return imported)))
+
+;;;###autoload
+(defun helm-godoc-at-cursor ()
+  (interactive)
+  (let ((definfo (godef--call (point))))
+    (if (string-match-p "\\`\\(?:-\\|error \\|godef: \\)" (car definfo))
+        (message "Error: no information at cursor")
+      (let* ((file (car (split-string (car definfo) ":")))
+             (func (car (split-string (cadr definfo))))
+             (buf (find-file-noselect file))
+             (package (with-current-buffer buf
+                        (goto-char (point-min))
+                        (when (re-search-forward helm-godoc--package-regexp nil t)
+                          (match-string-no-properties 1)))))
+        (if (not package)
+            (message "Not found: package")
+          (let ((real-package (helm-godoc--find-package package)))
+            (kill-buffer buf)
+            (if (not real-package)
+                (message "Not found: %s" package)
+              (with-current-buffer (get-buffer-create "*godoc*")
+                (view-mode -1)
+                (erase-buffer)
+                (let ((cmd (format "godoc %s %s" real-package func)))
+                  (unless (zerop (call-process-shell-command cmd nil t))
+                    (error "Failed: '%s'" cmd))
+                  (goto-char (point-min))
+                  (view-mode +1)
+                  (pop-to-buffer (current-buffer)))))))))))
+
+(defun helm-godoc--collect-imported-modules (buf)
   (setq helm-godoc--imported-modules nil)
   (let ((importeds nil))
-    (with-helm-current-buffer
+    (with-current-buffer buf
       (save-excursion
         (goto-char (point-min))
         (while (and (re-search-forward "^\\s-*import\\s-*\\((\\)?" nil t)
@@ -80,7 +121,7 @@
             (when imported
               (setq importeds (append imported importeds)))))))
     (when importeds
-      (setq helm-godoc--imported-modules (mapcar 'car importeds)))
+      (setq helm-godoc--imported-modules (mapcar 'cdr importeds)))
     importeds))
 
 (defun helm-godoc--import-package (candidate &optional as-alias)
@@ -110,7 +151,9 @@
 
 (defvar helm-godoc--imported-package-source
   '((name . "Imported Go Package")
-    (candidates . helm-godoc--collect-imported-modules)
+    (candidates . (lambda ()
+                    (helm-godoc--collect-imported-modules
+                     helm-current-buffer)))
     (volatile)
     (action . (("View Document" . godoc)
                ("View Source Code" . helm-godoc--view-source-code)))
