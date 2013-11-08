@@ -77,7 +77,7 @@
           return imported)))
 
 ;;;###autoload
-(defun helm-godoc-at-cursor ()
+(defun helm-godoc-at-point ()
   (interactive)
   (let ((definfo (godef--call (point))))
     (if (string-match-p "\\`\\(?:-\\|error \\|godef: \\)" (car definfo))
