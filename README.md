@@ -26,6 +26,9 @@ It has much features than this package.
 
 `godoc` with helm interface
 
+#### `helm-godoc-at-point`
+
+Pop up document of `function`/`type` at point
 
 ## Actions
 
