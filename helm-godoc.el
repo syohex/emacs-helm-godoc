@@ -1,11 +1,11 @@
-;;; helm-godoc.el --- godoc with helm interface
+;;; helm-godoc.el --- godoc with helm interface -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2013 by Syohei YOSHIDA
+;; Copyright (C) 2014 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-helm-godoc
 ;; Version: 0.01
-;; Package-Requires: ((go-mode "0") (helm "1.0"))
+;; Package-Requires: ((go-mode "0") (helm "1.0") (emacs "24"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
