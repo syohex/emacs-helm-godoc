@@ -90,8 +90,8 @@
           (push package not-imported)
         (go-import-add as-alias package)))
     (when not-imported
-      (error "Already imported: '%s'"
-             (mapconcat 'identity (reverse not-imported) ", ")))))
+      (message "Already imported: '%s'"
+               (mapconcat 'identity (reverse not-imported) ", ")))))
 
 (defsubst helm-godoc--view-source-buffer (package)
   (get-buffer-create (format "*Godoc %s*" package)))
