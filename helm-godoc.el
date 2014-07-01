@@ -97,7 +97,7 @@
   (get-buffer-create (format "*Godoc %s*" package)))
 
 (defun helm-godoc--view-document (package)
-  (let ((buf (get-buffer-create "*godoc*")))
+  (let ((buf (get-buffer-create (format "*godoc %s*" package))))
     (with-current-buffer buf
       (view-mode -1)
       (erase-buffer)
