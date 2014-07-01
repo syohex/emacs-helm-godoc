@@ -99,11 +99,11 @@
 (defun helm-godoc--view-document (package)
   (let ((buf (get-buffer-create "*godoc*")))
     (with-current-buffer buf
-      (setq buffer-read-only nil)
+      (view-mode -1)
       (erase-buffer)
       (unless (zerop (call-process "godoc" nil t nil package))
         (error "Faild: 'godoc %s'" package))
-      (setq buffer-read-only t)
+      (view-mode +1)
       (goto-char (point-min))
       (pop-to-buffer (current-buffer)))))
 
