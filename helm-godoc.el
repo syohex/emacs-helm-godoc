@@ -100,12 +100,11 @@
   (with-current-buffer (helm-godoc--view-source-buffer package)
     (view-mode -1)
     (erase-buffer)
-    (let ((cmd (concat "godoc -src " package)))
-      (unless (zerop (call-process-shell-command cmd nil t))
-        (error "Failed: %s" cmd))
-      (goto-char (point-min))
-      (go-mode)
-      (view-mode +1))
+    (unless (zerop (call-process "godoc" nil t nil "-src" package))
+      (error "Failed: 'godoc -src %s'" package))
+    (goto-char (point-min))
+    (go-mode)
+    (view-mode +1)
     (pop-to-buffer (current-buffer))))
 
 (defvar helm-godoc--imported-package-source
