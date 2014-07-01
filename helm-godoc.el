@@ -96,6 +96,17 @@
 (defsubst helm-godoc--view-source-buffer (package)
   (get-buffer-create (format "*Godoc %s*" package)))
 
+(defun helm-godoc--view-document (package)
+  (let ((buf (get-buffer-create "*godoc*")))
+    (with-current-buffer buf
+      (setq buffer-read-only nil)
+      (erase-buffer)
+      (unless (zerop (call-process "godoc" nil t nil package))
+        (error "Faild: 'godoc %s'" package))
+      (setq buffer-read-only t)
+      (goto-char (point-min))
+      (pop-to-buffer (current-buffer)))))
+
 (defun helm-godoc--view-source-code (package)
   (with-current-buffer (helm-godoc--view-source-buffer package)
     (view-mode -1)
@@ -113,7 +124,7 @@
                     (helm-godoc--collect-imported-modules
                      helm-current-buffer)))
     (volatile)
-    (action . (("View Document" . godoc)
+    (action . (("View Document" . helm-godoc--view-document)
                ("View Source Code" . helm-godoc--view-source-code)))
     (candidate-number-limit . 9999)))
 
@@ -121,7 +132,7 @@
   '((name . "Installed Go Package")
     (candidates . (lambda ()
                     (cons "builtin" (go-packages))))
-    (action . (("View Document" . godoc)
+    (action . (("View Document" . helm-godoc--view-document)
                ("View Source Code" . helm-godoc--view-source-code)
                ("Import Package" . helm-godoc--import-package)
                ("Import Package as Alternative Name" .
