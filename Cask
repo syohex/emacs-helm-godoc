@@ -1,10 +1,7 @@
 (source gnu)
 (source melpa)
 
-(package "helm-godoc" "0" "godoc with helm interface and some utilities")
-
-(depends-on "go-mode")
-(depends-on "helm")
+(package-file "helm-godoc.el")
 
 (development
  (depends-on "ert"))
