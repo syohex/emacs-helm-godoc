@@ -40,7 +40,7 @@
 
 (defvar helm-godoc--imported-modules nil)
 
-(defun helm-godoc--parse-oneline-import (start)
+(defun helm-godoc--parse-oneline-import ()
   (let ((end (line-end-position)))
     (when (re-search-forward helm-godoc--imported-module-regexp end t)
       (let ((alias (match-string-no-properties 1))
@@ -54,15 +54,15 @@
     (let ((end (point)))
       (save-excursion
         (goto-char start)
-        (loop with importeds = nil
-              while (< (point) end)
-              do
-              (progn
-                (helm-aif (helm-godoc--parse-oneline-import (point))
-                    (push it importeds))
-                (forward-line 1)
-                (back-to-indentation))
-              finally return (reverse importeds))))))
+        (cl-loop with importeds = nil
+                 while (< (point) end)
+                 do
+                 (progn
+                   (helm-aif (helm-godoc--parse-oneline-import)
+                       (push it importeds))
+                   (forward-line 1)
+                   (back-to-indentation))
+                 finally return (reverse importeds))))))
 
 (defun helm-godoc--collect-imported-modules (buf)
   (setq helm-godoc--imported-modules nil)
@@ -76,14 +76,14 @@
                 (group-import (match-string-no-properties 1)))
             (if (and group-import (string= group-import "("))
                 (setq imported (helm-godoc--parse-group-import (point)))
-              (setq imported (helm-godoc--parse-oneline-import (point))))
+              (setq imported (helm-godoc--parse-oneline-import)))
             (when imported
               (setq importeds (append imported importeds)))))))
     (when importeds
       (setq helm-godoc--imported-modules (mapcar 'cdr importeds)))
     importeds))
 
-(defun helm-godoc--import-package (candidate &optional as-alias)
+(defun helm-godoc--import-package (_candidate &optional as-alias)
   (let ((not-imported nil))
     (dolist (package (helm-marked-candidates))
       (if (member package helm-godoc--imported-modules)
