@@ -29,7 +29,7 @@
 
 (defgroup helm-godoc nil
   "`godoc' with helm interface"
-  :group 'helm)
+  :group 'go)
 
 (defconst helm-godoc--package-regexp
   (concat "[[:word:][:multibyte:]/:.]+"))
