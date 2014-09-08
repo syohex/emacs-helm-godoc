@@ -43,13 +43,20 @@
 
 (defvar helm-godoc--imported-modules nil)
 
+(defun helm-godoc--format-alias (alias package)
+  (cond ((string= alias "_")
+         (format "%s (Unused import)" package))
+        ((string= alias ".")
+         (format "%s (Dot import)" package))
+        (t (format "%s (alias: %s)" package alias))))
+
 (defun helm-godoc--parse-oneline-import ()
   (let ((end (line-end-position)))
     (when (re-search-forward helm-godoc--imported-module-regexp end t)
       (let ((alias (match-string-no-properties 1))
             (package (match-string-no-properties 2)))
         (if (and alias (not (string= alias "")))
-            (cons (format "%s (alias %s)" package alias) package)
+            (cons (helm-godoc--format-alias alias package) package)
           (cons package package))))))
 
 (defun helm-godoc--parse-group-import (start)
