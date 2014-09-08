@@ -29,16 +29,26 @@
 
 (defgroup helm-godoc nil
   "`godoc' with helm interface"
-  :group 'helm)
+  :group 'go)
+
+(defconst helm-godoc--package-path-regexp
+  (concat "[[:word:][:multibyte:]/:.-]+"))
 
 (defconst helm-godoc--package-regexp
-  (concat "[[:word:][:multibyte:]/:.]+"))
+  (concat "[[:word:][:multibyte:]:_.-]+"))
 
 (defconst helm-godoc--imported-module-regexp
   (format "\\(?:\\(%s\\)\\s-+\\)?\"\\(%s\\)\""
-          go-identifier-regexp helm-godoc--package-regexp))
+          helm-godoc--package-regexp helm-godoc--package-path-regexp))
 
 (defvar helm-godoc--imported-modules nil)
+
+(defun helm-godoc--format-alias (alias package)
+  (cond ((string= alias "_")
+         (format "%s (Unused import)" package))
+        ((string= alias ".")
+         (format "%s (Dot import)" package))
+        (t (format "%s (alias: %s)" package alias))))
 
 (defun helm-godoc--parse-oneline-import ()
   (let ((end (line-end-position)))
@@ -46,7 +56,7 @@
       (let ((alias (match-string-no-properties 1))
             (package (match-string-no-properties 2)))
         (if (and alias (not (string= alias "")))
-            (cons (format "%s (alias %s)" package alias) package)
+            (cons (helm-godoc--format-alias alias package) package)
           (cons package package))))))
 
 (defun helm-godoc--parse-group-import (start)
