@@ -31,12 +31,15 @@
   "`godoc' with helm interface"
   :group 'go)
 
+(defconst helm-godoc--package-path-regexp
+  (concat "[[:word:][:multibyte:]/:.-]+"))
+
 (defconst helm-godoc--package-regexp
-  (concat "[[:word:][:multibyte:]/:.]+"))
+  (concat "[[:word:][:multibyte:]:_.-]+"))
 
 (defconst helm-godoc--imported-module-regexp
   (format "\\(?:\\(%s\\)\\s-+\\)?\"\\(%s\\)\""
-          go-identifier-regexp helm-godoc--package-regexp))
+          helm-godoc--package-regexp helm-godoc--package-path-regexp))
 
 (defvar helm-godoc--imported-modules nil)
 
