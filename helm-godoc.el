@@ -150,11 +150,28 @@
                   (helm-godoc--import-package cand t)))))
     (candidate-number-limit . 9999)))
 
+(defvar helm-godoc--import-package-source
+  '((name . "Import Go Package")
+    (candidates . go-packages)
+    (action . (("Import Package" . helm-godoc--import-package)
+               ("Import Package as Alternative Name" .
+                (lambda (cand)
+                  (helm-godoc--import-package cand t)))
+               ("View Document" . helm-godoc--view-document)
+               ("View Source Code" . helm-godoc--view-source-code)))
+    (candidate-number-limit . 9999)))
+
 ;;;###autoload
 (defun helm-godoc ()
   (interactive)
   (helm :sources '(helm-godoc--imported-package-source
                    helm-godoc--installed-package-source)
+        :buffer (get-buffer-create "*helm godoc*")))
+
+;;;###autoload
+(defun helm-godoc-import ()
+  (interactive)
+  (helm :sources '(helm-godoc--import-package-source)
         :buffer (get-buffer-create "*helm godoc*")))
 
 (provide 'helm-godoc)
