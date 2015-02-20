@@ -1,4 +1,4 @@
-# helm-godoc.el [![Build Status](https://travis-ci.org/syohex/emacs-helm-godoc.png)](https://travis-ci.org/syohex/emacs-helm-godoc)
+# helm-godoc.el [![Build Status](https://travis-ci.org/syohex/emacs-helm-godoc.svg)](https://travis-ci.org/syohex/emacs-helm-godoc)
 
 ## Introduction
 
