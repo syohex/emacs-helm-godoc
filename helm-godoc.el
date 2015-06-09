@@ -106,12 +106,18 @@
 (defsubst helm-godoc--view-source-buffer (package)
   (get-buffer-create (format "*Godoc %s*" package)))
 
+(defun helm-godoc--run-view-document (package)
+  (if current-prefix-arg
+      (let ((queries (split-string (read-string "SubQuery: "))))
+        (apply #'process-file "godoc" nil t nil package queries))
+    (process-file "godoc" nil t nil package)))
+
 (defun helm-godoc--view-document (package)
   (let ((buf (get-buffer-create (format "*godoc %s*" package))))
     (with-current-buffer buf
       (view-mode -1)
       (erase-buffer)
-      (unless (zerop (process-file "godoc" nil t nil package))
+      (unless (zerop (helm-godoc--run-view-document package))
         (error "Faild: 'godoc %s'" package))
       (view-mode +1)
       (goto-char (point-min))
