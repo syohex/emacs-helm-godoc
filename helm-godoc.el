@@ -111,7 +111,7 @@
     (with-current-buffer buf
       (view-mode -1)
       (erase-buffer)
-      (unless (zerop (call-process "godoc" nil t nil package))
+      (unless (zerop (process-file "godoc" nil t nil package))
         (error "Faild: 'godoc %s'" package))
       (view-mode +1)
       (goto-char (point-min))
@@ -121,7 +121,7 @@
   (with-current-buffer (helm-godoc--view-source-buffer package)
     (view-mode -1)
     (erase-buffer)
-    (unless (zerop (call-process "godoc" nil t nil "-src" package))
+    (unless (zerop (process-file "godoc" nil t nil "-src" package))
       (error "Failed: 'godoc -src %s'" package))
     (goto-char (point-min))
     (go-mode)
