@@ -172,13 +172,13 @@
   (interactive)
   (helm :sources '(helm-godoc--imported-package-source
                    helm-godoc--installed-package-source)
-        :buffer (get-buffer-create "*helm godoc*")))
+        :buffer "*helm godoc*"))
 
 ;;;###autoload
 (defun helm-godoc-import ()
   (interactive)
   (helm :sources '(helm-godoc--import-package-source)
-        :buffer (get-buffer-create "*helm godoc*")))
+        :buffer "*helm godoc*"))
 
 (provide 'helm-godoc)
 
