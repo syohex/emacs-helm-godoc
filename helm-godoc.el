@@ -108,7 +108,9 @@
 
 (defun helm-godoc--run-view-document (package)
   (if current-prefix-arg
-      (let ((queries (split-string (read-string "SubQuery: "))))
+      (let* ((initval (with-helm-current-buffer
+                        (thing-at-point 'symbol)))
+             (queries (split-string (read-string "SubQuery: " initval))))
         (apply #'process-file "godoc" nil t nil package queries))
     (process-file "godoc" nil t nil package)))
 
