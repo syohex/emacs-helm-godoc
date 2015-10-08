@@ -141,6 +141,7 @@
     :candidates (lambda ()
                  (helm-godoc--collect-imported-modules
                   helm-current-buffer))
+    :candidate-number-limit 9999
     :volatile t
     :action '(("View Document" . helm-godoc--view-document)
               ("View Source Code" . helm-godoc--view-source-code))))
@@ -149,6 +150,7 @@
   (helm-build-sync-source "Installed Go Package"
     :candidates (lambda ()
                   (cons "builtin" (cons "unsafe" (go-packages))))
+    :candidate-number-limit 9999
     :action '(("View Document" . helm-godoc--view-document)
               ("View Source Code" . helm-godoc--view-source-code)
               ("Import Package" . helm-godoc--import-package)
@@ -159,6 +161,7 @@
 (defvar helm-godoc--import-package-source
   (helm-build-sync-source "Import Go Package"
     :candidates (go-packages)
+    :candidate-number-limit 9999
     :action '(("Import Package" . helm-godoc--import-package)
               ("Import Package as Alternative Name" .
                (lambda (cand)
