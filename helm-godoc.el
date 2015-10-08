@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-helm-godoc
 ;; Version: 0.01
-;; Package-Requires: ((go-mode "1.0.0") (helm-core "1.5.6") (emacs "24"))
+;; Package-Requires: ((go-mode "1.0.0") (helm-core "1.7.7") (emacs "24"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -137,37 +137,34 @@
     (pop-to-buffer (current-buffer))))
 
 (defvar helm-godoc--imported-package-source
-  '((name . "Imported Go Package")
-    (candidates . (lambda ()
-                    (helm-godoc--collect-imported-modules
-                     helm-current-buffer)))
-    (volatile)
-    (action . (("View Document" . helm-godoc--view-document)
-               ("View Source Code" . helm-godoc--view-source-code)))
-    (candidate-number-limit . 9999)))
+  (helm-build-sync-source "Imported Go Package"
+    :candidates (lambda ()
+                 (helm-godoc--collect-imported-modules
+                  helm-current-buffer))
+    :volatile t
+    :action '(("View Document" . helm-godoc--view-document)
+              ("View Source Code" . helm-godoc--view-source-code))))
 
 (defvar helm-godoc--installed-package-source
-  '((name . "Installed Go Package")
-    (candidates . (lambda ()
-                    (cons "builtin" (go-packages))))
-    (action . (("View Document" . helm-godoc--view-document)
-               ("View Source Code" . helm-godoc--view-source-code)
-               ("Import Package" . helm-godoc--import-package)
-               ("Import Package as Alternative Name" .
-                (lambda (cand)
-                  (helm-godoc--import-package cand t)))))
-    (candidate-number-limit . 9999)))
+  (helm-build-sync-source "Installed Go Package"
+    :candidates (lambda ()
+                  (cons "builtin" (cons "unsafe" (go-packages))))
+    :action '(("View Document" . helm-godoc--view-document)
+              ("View Source Code" . helm-godoc--view-source-code)
+              ("Import Package" . helm-godoc--import-package)
+              ("Import Package as Alternative Name" .
+               (lambda (cand)
+                 (helm-godoc--import-package cand t))))))
 
 (defvar helm-godoc--import-package-source
-  '((name . "Import Go Package")
-    (candidates . go-packages)
-    (action . (("Import Package" . helm-godoc--import-package)
-               ("Import Package as Alternative Name" .
-                (lambda (cand)
-                  (helm-godoc--import-package cand t)))
-               ("View Document" . helm-godoc--view-document)
-               ("View Source Code" . helm-godoc--view-source-code)))
-    (candidate-number-limit . 9999)))
+  (helm-build-sync-source "Import Go Package"
+    :candidates (go-packages)
+    :action '(("Import Package" . helm-godoc--import-package)
+              ("Import Package as Alternative Name" .
+               (lambda (cand)
+                 (helm-godoc--import-package cand t)))
+              ("View Document" . helm-godoc--view-document)
+              ("View Source Code" . helm-godoc--view-source-code))))
 
 ;;;###autoload
 (defun helm-godoc ()
