@@ -136,6 +136,11 @@
     (view-mode +1)
     (pop-to-buffer (current-buffer))))
 
+(defun helm-godoc--go-packages ()
+  (cl-loop for package in (go-packages)
+           unless (string-match-p "/Godeps/" package)
+           collect package))
+
 (defvar helm-godoc--imported-package-source
   (helm-build-sync-source "Imported Go Package"
     :candidates (lambda ()
@@ -149,7 +154,7 @@
 (defvar helm-godoc--installed-package-source
   (helm-build-sync-source "Installed Go Package"
     :candidates (lambda ()
-                  (cons "builtin" (cons "unsafe" (go-packages))))
+                  (cons "builtin" (cons "unsafe" (helm-godoc--go-packages))))
     :candidate-number-limit 9999
     :action '(("View Document" . helm-godoc--view-document)
               ("View Source Code" . helm-godoc--view-source-code)
@@ -160,10 +165,7 @@
 
 (defvar helm-godoc--import-package-source
   (helm-build-sync-source "Import Go Package"
-    :candidates (lambda ()
-                  (cl-loop for package in (go-packages)
-                           unless (string-match-p "/Godeps/" package)
-                           collect package))
+    :candidates #'helm-godoc--go-packages
     :candidate-number-limit 9999
     :action '(("Import Package" . helm-godoc--import-package)
               ("Import Package as Alternative Name" .
