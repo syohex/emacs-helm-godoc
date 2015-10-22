@@ -160,7 +160,10 @@
 
 (defvar helm-godoc--import-package-source
   (helm-build-sync-source "Import Go Package"
-    :candidates (go-packages)
+    :candidates (lambda ()
+                  (cl-loop for package in (go-packages)
+                           unless (string-match-p "/Godeps/" package)
+                           collect package))
     :candidate-number-limit 9999
     :action '(("Import Package" . helm-godoc--import-package)
               ("Import Package as Alternative Name" .
