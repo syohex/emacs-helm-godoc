@@ -138,7 +138,7 @@
 
 (defun helm-godoc--go-packages ()
   (cl-loop for package in (go-packages)
-           unless (string-match-p "/Godeps/" package)
+           unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
            collect package))
 
 (defvar helm-godoc--imported-package-source
