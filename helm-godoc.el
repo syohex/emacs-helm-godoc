@@ -22,6 +22,9 @@
 
 ;;; Commentary:
 
+;; helm-godoc provides viewing document and importing packaging statement
+;; functions with helm interface.
+
 ;;; Code:
 
 (require 'helm)
