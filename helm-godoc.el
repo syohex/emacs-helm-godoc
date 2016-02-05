@@ -155,7 +155,7 @@
 (defvar helm-godoc--installed-package-source
   (helm-build-sync-source "Installed Go Package"
     :candidates (lambda ()
-                  (cons "builtin" (cons "unsafe" (helm-godoc--go-packages))))
+                  (append '("builtin" "unsafe") (helm-godoc--go-packages)))
     :candidate-number-limit 9999
     :action (helm-make-actions
              "View Document" #'helm-godoc--view-document
