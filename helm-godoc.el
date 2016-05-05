@@ -180,12 +180,15 @@
              "View Document" #'helm-godoc--view-document
              "View Source Code" #'helm-godoc--view-source-code)))
 
+(defvar helm-godoc--history nil)
+
 ;;;###autoload
 (defun helm-godoc ()
   (interactive)
   (helm :sources '(helm-godoc--imported-package-source
                    helm-godoc--installed-package-source)
-        :buffer "*helm godoc*"))
+        :buffer "*helm godoc*"
+        :history 'helm-godoc--history))
 
 ;;;###autoload
 (defun helm-godoc-import ()
