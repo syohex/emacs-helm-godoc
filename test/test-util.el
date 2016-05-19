@@ -22,6 +22,7 @@
 ;;; Code:
 
 (require 'ert)
+(require 'cl-lib)
 
 (ert-deftest parse-oneline-import-stdlib ()
   "Parsing normal import for standard library"
@@ -115,5 +116,16 @@ import (
                           "github.com/nsf/termbox-go"
                           "github.com/peco/peco")))
       (should (equal got expected)))))
+
+(ert-deftest browse-url ()
+  "Browse URL"
+  (cl-letf (((symbol-function 'browse-url) (lambda (url &rest _args) url)))
+    (should (string= (helm-godoc--browse-url "fmt")  "https://golang.org/pkg/fmt"))
+    (should (string= (helm-godoc--browse-url "github.com/github/hub/version")
+                     "https://github.com/github/hub/"))
+    (should (string= (helm-godoc--browse-url "golang.org/x/net/context")
+                     "https://golang.org/x/net/context"))
+    (should (string= (helm-godoc--browse-url "9fans.net/go/acme")
+                     "9fans.net/go/acme"))))
 
 ;;; test-util.el ends here

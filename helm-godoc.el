@@ -90,11 +90,11 @@
                 (group-import (match-string-no-properties 1)))
             (if (and group-import (string= group-import "("))
                 (setq imported (helm-godoc--parse-group-import (point)))
-              (setq imported (helm-godoc--parse-oneline-import)))
+              (setq imported (list (helm-godoc--parse-oneline-import))))
             (when imported
-              (setq importeds (append (list imported) importeds)))))))
+              (setq importeds (append imported importeds)))))))
     (when importeds
-      (setq helm-godoc--imported-modules (mapcar 'cdr importeds)))
+      (setq helm-godoc--imported-modules (mapcar #'cdr importeds)))
     importeds))
 
 (defun helm-godoc--import-package (_candidate &optional as-alias)
@@ -145,16 +145,26 @@
            unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
            collect package))
 
+(defun helm-godoc--browse-url (package)
+  (let ((url (cond ((string-match "github\\.com/[^/]+/[^/]+/" package)
+                    (concat "https://" (match-string-no-properties 0 package)))
+                   ((string-match-p "golang.org/" package)
+                    (concat "https://" package))
+                   ((not (string-match-p "\\." package))
+                    (concat "https://golang.org/pkg/" package))
+                   (t package))))
+    (browse-url url)))
+
 (defvar helm-godoc--imported-package-source
   (helm-build-sync-source "Imported Go Package"
     :candidates (lambda ()
-                 (helm-godoc--collect-imported-modules
-                  helm-current-buffer))
+                  (helm-godoc--collect-imported-modules helm-current-buffer))
     :candidate-number-limit 9999
     :volatile t
     :action (helm-make-actions
              "View Document" #'helm-godoc--view-document
-             "View Source Code" #'helm-godoc--view-source-code)))
+             "View Source Code" #'helm-godoc--view-source-code
+             "Browse Web page" #'helm-godoc--browse-url)))
 
 (defvar helm-godoc--installed-package-source
   (helm-build-sync-source "Installed Go Package"
@@ -167,7 +177,8 @@
              "Import Package" #'helm-godoc--import-package
              "Import Package as Alternative Name"
              (lambda (cand)
-               (helm-godoc--import-package cand t)))))
+               (helm-godoc--import-package cand t))
+             "Browse Web page" #'helm-godoc--browse-url)))
 
 (defvar helm-godoc--import-package-source
   (helm-build-sync-source "Import Go Package"
