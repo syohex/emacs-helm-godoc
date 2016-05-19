@@ -92,7 +92,7 @@
                 (setq imported (helm-godoc--parse-group-import (point)))
               (setq imported (helm-godoc--parse-oneline-import)))
             (when imported
-              (setq importeds (append imported importeds)))))))
+              (setq importeds (append (list imported) importeds)))))))
     (when importeds
       (setq helm-godoc--imported-modules (mapcar 'cdr importeds)))
     importeds))
