@@ -5,7 +5,7 @@
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 ;; URL: https://github.com/syohex/emacs-helm-godoc
 ;; Version: 0.01
-;; Package-Requires: ((go-mode "1.0.0") (helm-core "1.7.7") (emacs "24"))
+;; Package-Requires: ((go-mode "1.0.0") (helm-core "1.7.7") (emacs "24.4"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 
 (require 'helm)
 (require 'go-mode)
+(require 'subr-x)
 
 (defgroup helm-godoc nil
   "`godoc' with helm interface"
@@ -58,7 +59,7 @@
     (when (re-search-forward helm-godoc--imported-module-regexp end t)
       (let ((alias (match-string-no-properties 1))
             (package (match-string-no-properties 2)))
-        (if (and alias (not (string= alias "")))
+        (if (and alias (not (string-empty-p alias)))
             (cons (helm-godoc--format-alias alias package) package)
           (cons package package))))))
 
