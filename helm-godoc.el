@@ -146,7 +146,7 @@
            collect package))
 
 (defun helm-godoc--browse-url (package)
-  (let ((url (cond ((string-match "github\\.com/[^/]+/[^/]+/" package)
+  (let ((url (cond ((string-match "github\\.com/[^/]+/[^/]+" package)
                     (concat "https://" (match-string-no-properties 0 package)))
                    ((string-match-p "golang.org/" package)
                     (concat "https://" package))
