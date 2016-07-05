@@ -107,43 +107,60 @@
       (message "Already imported: '%s'"
                (mapconcat 'identity (reverse not-imported) ", ")))))
 
+(defmacro with-helm-godoc-gopath (&rest body)
+  (declare (indent 0) (debug t))
+  (let ((vendor-path (cl-gensym))
+        (orig-path (cl-gensym)))
+    `(let* ((,orig-path (getenv "GOPATH"))
+            (,vendor-path (expand-file-name
+                           (locate-dominating-file default-directory "vendor/")))
+            (process-environment (if ,vendor-path
+                                     (cons (format "GOPATH=%s/vendor:%s" ,vendor-path ,orig-path)
+                                           process-environment)
+                                   process-environment)))
+       ,@body)))
+
 (defsubst helm-godoc--view-source-buffer (package)
   (get-buffer-create (format "*Godoc %s*" package)))
 
 (defun helm-godoc--run-view-document (package)
-  (if current-prefix-arg
-      (let* ((initval (with-helm-current-buffer
-                        (thing-at-point 'symbol)))
-             (queries (split-string (read-string "SubQuery: " initval))))
-        (apply #'process-file "godoc" nil t nil package queries))
-    (process-file "godoc" nil t nil package)))
+  (with-helm-godoc-gopath
+    (if current-prefix-arg
+        (let* ((initval (with-helm-current-buffer
+                          (thing-at-point 'symbol)))
+               (queries (split-string (read-string "SubQuery: " initval))))
+          (apply #'process-file "godoc" nil t nil package queries))
+      (process-file "godoc" nil t nil package))))
 
 (defun helm-godoc--view-document (package)
-  (let ((buf (get-buffer-create (format "*godoc %s*" package))))
-    (with-current-buffer buf
-      (view-mode -1)
-      (erase-buffer)
-      (unless (zerop (helm-godoc--run-view-document package))
-        (error "Faild: 'godoc %s'" package))
-      (view-mode +1)
-      (goto-char (point-min))
-      (pop-to-buffer (current-buffer)))))
+  (with-helm-godoc-gopath
+    (let ((buf (get-buffer-create (format "*godoc %s*" package))))
+      (with-current-buffer buf
+        (view-mode -1)
+        (erase-buffer)
+        (unless (zerop (helm-godoc--run-view-document package))
+          (error "Faild: 'godoc %s'" package))
+        (view-mode +1)
+        (goto-char (point-min))
+        (pop-to-buffer (current-buffer))))))
 
 (defun helm-godoc--view-source-code (package)
   (with-current-buffer (helm-godoc--view-source-buffer package)
     (view-mode -1)
     (erase-buffer)
-    (unless (zerop (process-file "godoc" nil t nil "-src" package))
-      (error "Failed: 'godoc -src %s'" package))
+    (with-helm-godoc-gopath
+      (unless (zerop (process-file "godoc" nil t nil "-src" package))
+        (error "Failed: 'godoc -src %s'" package)))
     (goto-char (point-min))
     (go-mode)
     (view-mode +1)
     (pop-to-buffer (current-buffer))))
 
 (defun helm-godoc--go-packages ()
-  (cl-loop for package in (go-packages)
-           unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
-           collect package))
+  (with-helm-godoc-gopath
+    (cl-loop for package in (go-packages)
+             unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
+             collect package)))
 
 (defun helm-godoc--browse-url (package)
   (let ((url (cond ((string-match "github\\.com/[^/]+/[^/]+" package)
