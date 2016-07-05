@@ -122,7 +122,7 @@ import (
   (cl-letf (((symbol-function 'browse-url) (lambda (url &rest _args) url)))
     (should (string= (helm-godoc--browse-url "fmt")  "https://golang.org/pkg/fmt"))
     (should (string= (helm-godoc--browse-url "github.com/github/hub/version")
-                     "https://github.com/github/hub/"))
+                     "https://github.com/github/hub"))
     (should (string= (helm-godoc--browse-url "golang.org/x/net/context")
                      "https://golang.org/x/net/context"))
     (should (string= (helm-godoc--browse-url "9fans.net/go/acme")
