@@ -29,6 +29,7 @@
 
 (require 'helm)
 (require 'go-mode)
+(require 'cl-lib)
 (require 'subr-x)
 
 (defgroup helm-godoc nil
@@ -112,10 +113,11 @@
   (let ((vendor-path (cl-gensym))
         (orig-path (cl-gensym)))
     `(let* ((,orig-path (getenv "GOPATH"))
-            (,vendor-path (expand-file-name
-                           (locate-dominating-file default-directory "vendor/")))
+            (,vendor-path (cl-loop for dir in '("vendor" "_vendor")
+                                   when (locate-dominating-file default-directory dir)
+                                   return (concat it "/" dir)))
             (process-environment (if ,vendor-path
-                                     (cons (format "GOPATH=%s/vendor:%s" ,vendor-path ,orig-path)
+                                     (cons (format "GOPATH=%s:%s" (expand-file-name ,vendor-path) ,orig-path)
                                            process-environment)
                                    process-environment)))
        ,@body)))
