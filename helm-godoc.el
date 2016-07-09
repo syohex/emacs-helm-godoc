@@ -115,7 +115,7 @@
     `(let* ((,orig-path (getenv "GOPATH"))
             (,vendor-path (cl-loop for dir in '("vendor" "_vendor")
                                    when (locate-dominating-file default-directory dir)
-                                   return (concat it "/" dir)))
+                                   return (concat it dir)))
             (process-environment (if ,vendor-path
                                      (cons (format "GOPATH=%s:%s" (expand-file-name ,vendor-path) ,orig-path)
                                            process-environment)
