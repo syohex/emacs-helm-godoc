@@ -47,6 +47,7 @@
           helm-godoc--package-regexp helm-godoc--package-path-regexp))
 
 (defvar helm-godoc--imported-modules nil)
+(defconst helm-godoc--has-gopkgs (executable-find "gopkgs"))
 
 (defun helm-godoc--format-alias (alias package)
   (cond ((string= alias "_")
@@ -160,9 +161,11 @@
 
 (defun helm-godoc--go-packages ()
   (with-helm-godoc-gopath
-    (cl-loop for package in (go-packages)
-             unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
-             collect package)))
+   (cl-loop for package in (if helm-godoc--has-gopkgs
+                               (process-lines "gopkgs")
+                             (go-packages))
+            unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
+            collect package)))
 
 (defun helm-godoc--browse-url (package)
   (let ((url (cond ((string-match "github\\.com/[^/]+/[^/]+" package)
