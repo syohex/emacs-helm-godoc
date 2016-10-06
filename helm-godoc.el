@@ -162,7 +162,7 @@
 (defun helm-godoc--go-packages ()
   (with-helm-godoc-gopath
    (cl-loop for package in (if helm-godoc--has-gopkgs
-                               (process-lines "gopkgs")
+                               (sort (process-lines "gopkgs") #'string<)
                              (go-packages))
             unless (string-match-p "\\(?:^\\|/\\)\\(?:Godeps\\|internal\\)\\(?:/\\|$\\)" package)
             collect package)))
