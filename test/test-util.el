@@ -1,6 +1,6 @@
 ;;; test-util.el --- unit test for helm-go.el
 
-;; Copyright (C) 2014 by Syohei YOSHIDA
+;; Copyright (C) 2017 by Syohei YOSHIDA
 
 ;; Author: Syohei YOSHIDA <syohex@gmail.com>
 
